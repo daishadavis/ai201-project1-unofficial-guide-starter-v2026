@@ -24,6 +24,7 @@ contains the answer.
 
 **Why this target:**
 <!-- e.g. "One of my questions is about a topic only two documents mention, so
+
      I expect that one to be hard." -->
 
 ---
@@ -37,6 +38,8 @@ Every answer the system produces names at least one source document.
      or what would have to go wrong for it not to be? -->
 
 ---
+
+
 
 ## 3. The relevance gate stops out-of-corpus questions
 
@@ -53,9 +56,11 @@ in at least 4 of 5 tries.
 <!-- What did your distances look like when you set the cutoff in Milestone 4?
      Was there a clean gap, or did the two groups overlap? -->
 
+
 ---
 
 ## 4. Something about your chunks
+At least 4 of 5 sampled chunks read as a complete fact -  no chunk splits a multi-part answer across a chunk boundary.
 
 <!-- YOU WRITE THIS ONE.
 
@@ -72,12 +77,14 @@ in at least 4 of 5 tries.
 
 
 **Why this target:**
+I expect this to mostly hold, but two of my test questions have two-part answers ("floors 2 and 5," "October and November"), and if either list happens to fall near a chunk boundary, splitting could occur — so I'm not requiring 5/5.
 
 
 
 ---
 
 ## 5. Your choice
+When the retrieval returns no chunks relevant to the question, the system responds that it can't find the information, rather than generating an answer anyway.
 
 <!-- YOU WRITE THIS ONE TOO.
 
@@ -90,6 +97,7 @@ in at least 4 of 5 tries.
 
 
 **Why this target:**
+Depending on how specific the questions are the system may not be able to find information on it depending on how it was chunked.
 
 
 
