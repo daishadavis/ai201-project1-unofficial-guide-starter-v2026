@@ -20,27 +20,34 @@
 # Unit 1
 
 ## What This Does
+A retrieval-augmented question-answering system over a corpus of campus-life advice threads (advice_threads). Documents are indexed as embeddings; when a question comes in, the system retrieves the most relevant chunks, checks whether any are close enough to be worth answering from, and if so, generates an answer grounded only in those chunks — citing the source file. Questions the corpus doesn't cover (e.g., general trivia, unrelated technical questions) are refused rather than answered from the model's own knowledge.
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** N/A — chunks are split structurally, not by character count.
+**Overlap:** N/A — no overlap needed; replies don't share content with each other.
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+My corpus (`advice_threads`) is forum threads: a title line, then several
+independently-voted replies. When I read these in Milestone 1, each reply was
+already a complete, self-contained thought responding to the thread's
+question — nothing like a long guide where a fixed window makes sense.
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+The starter's fixed 800-character windows were the wrong shape for this data:
+on a short thread, a window could merge two unrelated replies into one chunk
+(diluting the correct answer with an off-topic one). On a thread that didn't
+divide evenly by 800 characters, it produced a chunk as short as 2 characters
+— pure noise, the tail end of a document with no content in it.
 
-     Milestone 3. -->
+Instead, `split_documents` splits each document on its `--- reply N (X votes)
+---` markers, so one chunk = one reply. A reply alone still loses the
+question it's answering (e.g. "Yeah. Cuts an 18 minute walk to about 6."
+means nothing out of context), so I prepend the thread's title line to every
+reply chunk to keep it self-contained.
+
+Result: 26 chunks (fixed-window baseline, avg 487 characters, shortest 2,
+longest 793) became 75 chunks avg 175 characters, shortest 105, longest
+254 — smaller, far more uniform, and the 2-character debris chunk is gone.
 
 ## Sample Chunks
 
@@ -92,22 +99,17 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
      visible. Milestone 4. -->
 
 **Question:**
-
+Which building has it's own kitchenette?
 **Answer:**
 
-```
-```
+Fenwick has kitchenettes (thread_meal_plan_tier.txt).
+
+Sources retrieved: thread_laundry_timing.txt, thread_meal_plan_tier.txt, thread_roommate_conflict.txt, thread_study_spots.txt, thread_winter_advice.txt
+
 
 **My relevance cutoff:**
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+The cutoff (0.75) and the two distance groups (in-scope 0.322–0.715, out-of-scope 0.787–0.930)
 
 | Question | In corpus? | Best distance |
 |---|---|---|
@@ -123,6 +125,27 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
      "I used AI to help me code" is not.
 
      Milestone 5. -->
+    
+**Chunking function (Milestone 3):** I described my corpus structure (forum
+threads with a title and numbered `--- reply N (X votes) ---` blocks) and
+asked for a replacement for `split_documents` that would split on reply
+boundaries instead of fixed-size windows. Claude wrote a version using a
+regex on the reply markers, with the thread title prepended to each reply so
+it wouldn't lose context. It didn't include the `import re` the function
+needed — I added that myself. Before trusting it, I ran `python chunker.py`
+to check the actual numbers (26 → 75 chunks, shortest jumped from 2 to 105
+characters) rather than assuming the strategy worked just because the code
+ran without errors.
+
+**Relevance cutoff (Milestone 4):** I ran my five test questions and the
+five `OUT_OF_SCOPE` questions through `retrieve` and pasted the distances to
+Claude to help find the gap. It suggested 0.75, sitting between my worst
+in-scope distance (0.715, kitchenette) and my best out-of-scope distance
+(0.787, World Cup). Rather than just setting it in `config.py` on that
+recommendation, I re-ran both of those specific questions at 0.75 myself to
+confirm the kitchenette question now passed the gate and the World Cup
+question still got refused, before committing the number.
+
 
 **1.**
 
