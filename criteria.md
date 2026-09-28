@@ -27,6 +27,9 @@ contains the answer.
 
      I expect that one to be hard." -->
 
+**Verdict: MET.** All three runs came out 5/5 — every question's retrieved
+set had a chunk containing the answer, in every run, not just on average.
+
 ---
 
 ## 2. Every answer names a source
@@ -36,6 +39,10 @@ Every answer the system produces names at least one source document.
 **Why this target:**
 <!-- Why all five and not four? What about your setup makes that achievable —
      or what would have to go wrong for it not to be? -->
+
+**Verdict: MET.** All 15 generated answers (5 questions × 3 runs) named a
+source file, checked against the actual answer text in the run log, with
+zero exceptions.
 
 ---
 
@@ -56,6 +63,9 @@ in at least 4 of 5 tries.
 <!-- What did your distances look like when you set the cutoff in Milestone 4?
      Was there a clean gap, or did the two groups overlap? -->
 
+**Verdict: MET.** 5 of 5 out-of-scope questions were refused at the 0.75
+cutoff. Retrieval and the gate are deterministic, so this is one
+measurement, not three, and the same result holds across all three columns.
 
 ---
 
@@ -79,6 +89,13 @@ At least 4 of 5 sampled chunks read as a complete fact -  no chunk splits a mult
 **Why this target:**
 I expect this to mostly hold, but two of my test questions have two-part answers ("floors 2 and 5," "October and November"), and if either list happens to fall near a chunk boundary, splitting could occur — so I'm not requiring 5/5.
 
+**Verdict: MET.** The two chunks carrying multi-part answers
+(`thread_study_spots.txt` — "floors 2 through 5" — and
+`thread_internship_timing.txt` — "October and November") both came back
+intact, not split across a chunk boundary. The five chunks sampled in
+Milestone 3 were also complete, though none of those five happened to
+contain a multi-part fact, so the sample that actually tested the split
+risk was the two targeted chunks rather than a random 5.
 
 
 ---
@@ -99,7 +116,11 @@ When the retrieval returns no chunks relevant to the question, the system respon
 **Why this target:**
 Depending on how specific the questions are the system may not be able to find information on it depending on how it was chunked.
 
-
+**Verdict: MET.** All 5 out-of-scope questions, where retrieval had nothing
+relevant, produced a refusal rather than a fabricated answer — the same
+evidence as criterion 3. This criterion hasn't yet been tested by a
+genuinely different case (an in-scope-sounding question my corpus doesn't
+actually answer), so the two criteria currently share one test.
 
 ---
 
